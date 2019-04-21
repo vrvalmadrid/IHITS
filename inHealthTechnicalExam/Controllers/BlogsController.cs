@@ -50,6 +50,7 @@ namespace inHealthTechnicalExam.Controllers
             {
                 blog.CreatedDate = DateTime.Now;
                 blog.CreatedBy = UserRepository.GetUserByUsername(User.Identity.Name).ID;
+                blog.IsDeleted = false;
                 BlogRepository.CreateBlog(blog);
                 return RedirectToAction(nameof(Index));
             }

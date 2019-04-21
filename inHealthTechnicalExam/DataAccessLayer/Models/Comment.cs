@@ -12,10 +12,6 @@ namespace inHealthTechnicalExam.DataAccessLayer.Models
         [Display(Name = "Comment Id")]
         public int ID { get; set; }
         [Required]
-        [Column(TypeName = "int")]
-        [Display(Name = "Blog Id")]
-        public int BlogID { get; set; }
-        [Required]
         [Column(TypeName = "nvarchar(max)")]
         [Display(Name = "Remarks")]
         public string Remarks { get; set; }
@@ -27,6 +23,11 @@ namespace inHealthTechnicalExam.DataAccessLayer.Models
         [Column(TypeName = "datetime")]
         [Display(Name = "Created Date")]
         public DateTime CreatedDate { get; set; }
+        [Required]
+        [Column(TypeName = "int")]
+        [Display(Name = "Blog Id")]
+        [ForeignKey("Blog")]
+        public int BlogID { get; set; }
         public Blog blog { get; set; }
     }
 }

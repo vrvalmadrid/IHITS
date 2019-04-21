@@ -10,5 +10,6 @@ namespace inHealthTechnicalExam.BusinessLayer.IRepository
         User GetUserByUsername(string username);
         User GetUserByID(int id);
         bool IsUserExist(string username);
+        bool IsUserDeleted(string username);
     }
 }

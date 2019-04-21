@@ -15,7 +15,7 @@ namespace inHealthTechnicalExam.BusinessLayer.Repository
         }
         public List<Blog> GetAllBlogs()
         {
-            return _context.Blogs.ToList();
+            return _context.Blogs.Where(x => x.IsDeleted == false).ToList();
         }
         public bool CreateBlog(Blog blog)
         {
@@ -28,7 +28,9 @@ namespace inHealthTechnicalExam.BusinessLayer.Repository
         }
         public bool DeleteBlogByID(int id)
         {
-            _context.Blogs.Remove(GetBlogByID(id));
+            var blog = GetBlogByID(id);
+            blog.IsDeleted = true;
+            _context.Blogs.Update(blog);
             return _context.SaveChanges() >= 1;
         }
 

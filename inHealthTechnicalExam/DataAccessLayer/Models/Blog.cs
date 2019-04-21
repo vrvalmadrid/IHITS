@@ -28,6 +28,7 @@ namespace inHealthTechnicalExam.DataAccessLayer.Models
         [Column(TypeName = "int")]
         [Display(Name = "Created By")]
         public int CreatedBy { get; set; }
-        public List<Comment> Comments { get; set; }
+        public bool IsDeleted { get; set; }
+        public ICollection<Comment> Comments { get; set; }
     }
 }

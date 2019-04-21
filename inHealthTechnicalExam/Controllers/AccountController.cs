@@ -7,8 +7,10 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Linq;
 using System.Security.Claims;
+using System.Text;
 
 namespace inHealthTechnicalExam.Controllers
 {
@@ -36,7 +38,7 @@ namespace inHealthTechnicalExam.Controllers
             {
                 if (!UserRepository.IsUserExist(registerViewModel.Username))
                 {
-                    User newUser = new User { Username = registerViewModel.Username,Password = registerViewModel.Password, Name = registerViewModel.Name };
+                    User newUser = new User { Username = registerViewModel.Username, Password = new Utility().Encrypt(registerViewModel.Password), Name = registerViewModel.Name, IsDeleted = false };
                     UserRepository.CreateUser(newUser);
                     if (IsFirstUser())
                     {
@@ -69,22 +71,31 @@ namespace inHealthTechnicalExam.Controllers
                 ClaimsIdentity identity = null;
                 if (UserRepository.IsUserExist(loginViewModel.Username))
                 {
-                    var user = UserRepository.GetUserByUsername(loginViewModel.Username);
-                    if (user.Password == loginViewModel.Password)
+                    if(!UserRepository.IsUserDeleted(loginViewModel.Username))
                     {
-                        var userrole = UserRoleRepository.GetAllUserRolesByUserID(user.ID).FirstOrDefault();
-                        var role = RoleRepository.GetRoleByID(userrole.RoleID);
-                        identity = new ClaimsIdentity(new[] { new Claim(ClaimTypes.Name, loginViewModel.Username), new Claim(ClaimTypes.Role, role.RoleCode) }, CookieAuthenticationDefaults.AuthenticationScheme);
-                        AuthorizeAttribute authorizeattribute = new AuthorizeAttribute() { Roles = role.RoleCode };
-                        var principal = new ClaimsPrincipal(identity);
-                        var login = HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
-                        return RedirectToAction("Index", "Home");
+                        var user = UserRepository.GetUserByUsername(loginViewModel.Username);
+                        user.Password = new Utility().Decrypt(user.Password);
+                        if (user.Password == loginViewModel.Password)
+                        {
+                            var userrole = UserRoleRepository.GetAllUserRolesByUserID(user.ID).FirstOrDefault();
+                            var role = RoleRepository.GetRoleByID(userrole.RoleID);
+                            identity = new ClaimsIdentity(new[] { new Claim(ClaimTypes.Name, loginViewModel.Username), new Claim(ClaimTypes.Role, role.RoleCode) }, CookieAuthenticationDefaults.AuthenticationScheme);
+                            AuthorizeAttribute authorizeattribute = new AuthorizeAttribute() { Roles = role.RoleCode };
+                            var principal = new ClaimsPrincipal(identity);
+                            var login = HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
+                            return RedirectToAction("Index", "Home");
+                        }
+                        else
+                        {
+                            TempData["UserLoginFailed"] = "Login Failed.Please enter correct credentials";
+                            return View();
+                        }
                     }
                     else
                     {
-                        TempData["UserLoginFailed"] = "Login Failed.Please enter correct credentials";
+                        TempData["UserLoginFailed"] = "Login Failed. Cann't access the account. Please contact your administrator.";
                         return View();
-                    }
+                    }                    
                 }
                 else
                 {

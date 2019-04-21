@@ -23,6 +23,8 @@ namespace inHealthTechnicalExam.DataAccessLayer.Models
         [Column(TypeName = "nvarchar(max)")]
         [Display(Name = "Name")]
         public string Name { get; set; }
-        public List<UserRole> UserRoles { get; set; }
+        public bool IsDeleted { get; set; }
+
+        public ICollection<UserRole> UserRoles { get; set; }
     }
 }

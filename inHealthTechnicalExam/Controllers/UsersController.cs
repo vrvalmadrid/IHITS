@@ -71,6 +71,7 @@ namespace inHealthTechnicalExam.Controllers
             var userDetails = from a in UserRepository.GetAllUsers()
                               join b in UserRoleRepository.GetAllUserRoles() on a.ID equals b.UserID
                               join c in RoleRepository.GetAllRoles() on b.RoleID equals c.ID
+                              where a.IsDeleted == false
                               select new UserAccessRoleViewModel
                               {
                                   ID = a.ID,

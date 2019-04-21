@@ -15,7 +15,7 @@ namespace inHealthTechnicalExam.BusinessLayer.Repository
         }
         public List<User> GetAllUsers()
         {
-            return _context.Users.ToList();
+            return _context.Users.Where(x => x.IsDeleted == false).ToList();
         }
         public bool CreateUser(User user)
         {
@@ -36,8 +36,14 @@ namespace inHealthTechnicalExam.BusinessLayer.Repository
         }
         public bool DeleteUserByID(int id)
         {
-            _context.Users.Remove(GetUserByID(id));
+            var user = GetUserByID(id);
+            user.IsDeleted = true;
+            _context.Users.Update(user);
             return _context.SaveChanges() >= 1;
+        }
+        public bool IsUserDeleted(string username)
+        {
+            return GetUserByUsername(username).IsDeleted == true ? true : false;
         }
     }
 }
